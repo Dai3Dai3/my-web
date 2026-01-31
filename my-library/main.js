@@ -1,3 +1,3 @@
 function hello(){
-    window.alert('4');
+    window.alert('5');
 }
