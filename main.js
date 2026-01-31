@@ -1,3 +1,3 @@
 function hello(){
-    window.alert('mazi');
+    window.alert('3');
 }
