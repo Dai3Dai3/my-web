@@ -1,3 +1,3 @@
 function hello(){
-    window.alert('こんにちは');
+    window.alert('おはよう');
 }
