@@ -1,0 +1,64 @@
+pipeline {
+  agent { label 'linux' }
+  environment {
+    NODE_VERSION = '18'
+  }
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
+    stage('Install Dependencies') {
+      steps {
+        sh 'node --version || true'
+        sh 'npm ci'
+      }
+    }
+    stage('Lint') {
+      steps {
+        sh 'npm run lint'
+      }
+    }
+    stage('Test') {
+      steps {
+        sh 'npm test'
+      }
+      post {
+        always {
+          junit 'test-results/**/*.xml'
+        }
+      }
+    }
+    stage('Build') {
+      when { 
+        branch pattern: 'main|develop', comparator: 'REGEXP'
+      }
+      steps {
+        sh 'npm run build'
+      }
+    }
+    stage('Deploy to Staging') {
+      when { branch 'develop' }
+      steps {
+        sh 'npm run deploy:staging'
+      }
+    }
+    stage('Deploy to Production') {
+      when { 
+        tag pattern: '^v[0-9]+\\.[0-9]+\\.[0-9]+$', comparator: 'REGEXP'
+      }
+      steps {
+        sh 'npm run deploy:production'
+      }
+    }
+  }
+  post {
+    success {
+      echo 'Build succeeded'
+    }
+    failure {
+      echo 'Build failed - notifying team'
+    }
+  }
+}

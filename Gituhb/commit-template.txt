@@ -1,0 +1,12 @@
+# Commit message template
+# Set with: git config commit.template <path-to-this-file>
+
+type(scope): short summary (max 72 chars)
+
+Longer description (wrap at 72 chars).
+
+- Why: explain the motivation for the change
+- What: highlight side effects and key points
+
+Refs: #ISSUE-NUMBER
+Co-authored-by: Name <email@example.com>

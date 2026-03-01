@@ -1,0 +1,51 @@
+name: Excel / Config Validation
+
+on:
+  pull_request:
+    paths:
+      - 'configs/excel/**'
+      - 'configs/EXCEL_CHANGELOG.csv'
+
+jobs:
+  excel-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: python -m pip install openpyxl pandas
+
+      - name: Find changed xlsx files
+        id: find_changes
+        run: |
+          git fetch origin ${{ github.base_ref }} 2>/dev/null || true
+          CHANGED=$(git diff --name-only origin/${{ github.base_ref }}..HEAD | grep '\.xlsx$' || true)
+          echo "changed=$CHANGED" >> $GITHUB_OUTPUT
+
+      - name: Convert xlsx to csv
+        if: steps.find_changes.outputs.changed != ''
+        run: |
+          python scripts/xlsx_to_csv.py --out-dir configs/csv $(echo "${{ steps.find_changes.outputs.changed }}")
+
+      - name: Verify EXCEL_CHANGELOG updated
+        run: |
+          CHANGED=$(echo "${{ steps.find_changes.outputs.changed }}")
+          if [ -n "$CHANGED" ]; then
+            echo "Excel files changed: $CHANGED"
+            git diff --name-only origin/${{ github.base_ref }}..HEAD | grep 'EXCEL_CHANGELOG.csv' >/dev/null || \
+              (echo "ERROR: EXCEL_CHANGELOG.csv must be updated when Excel files change" && exit 1)
+          fi
+
+      - name: Upload CSV artifacts
+        if: steps.find_changes.outputs.changed != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: excel-csv-preview
+          path: configs/csv/
