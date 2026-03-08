@@ -1,0 +1,2 @@
+# Git LFS tracking for binary files
+configs/excel/*.xlsx filter=lfs diff=lfs merge=lfs -text

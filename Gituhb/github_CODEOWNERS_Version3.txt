@@ -1,0 +1,17 @@
+# CODEOWNERS: パスごとに自動レビュワーを割当
+# フォーマット: <パターン> @username @team/name
+
+# プロジェクト全体の管理者
+* @maintainers
+
+# ドキュメント
+/docs/ @org/docs-team
+
+# フロントエンド
+/src/frontend/ @org/frontend-team
+
+# バックエンド
+/src/backend/ @org/backend-team
+
+# 構成管理
+/configs/excel/ @org/config-team
