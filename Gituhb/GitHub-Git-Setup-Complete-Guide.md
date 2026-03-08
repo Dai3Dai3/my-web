@@ -1010,8 +1010,6 @@ git apply 0001-remove-debug-lines.patch
 
 ---
 
-
-
 ---
 
 ## 2) CHANGELOG・EXCEL_CHANGELOG を更新
