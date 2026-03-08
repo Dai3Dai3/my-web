@@ -691,6 +691,126 @@ push すると PR に自動で反映される。
 SourceTree を使ったリリース作業の手順です。  
 release ブランチの作成、CHANGELOG 更新、バージョン更新までを含みます。
 
+
+
+# 9. リリース手順（リリース担当向け・タグ運用版）
+
+本手順は CHANGELOG を使用せず、**Git タグを公式なリリース情報**として扱う運用です。
+
+---
+
+## 1) Release ブランチ作成
+
+### ▼ SourceTree 操作
+1. 左パネルで **develop** をダブルクリック（チェックアウト）
+2. 上部メニュー **Fetch**
+3. 上部メニュー **Pull**（origin/develop を最新化）
+4. 上部メニュー **Branch** をクリック  
+   Branch name に以下を入力  
+   ```
+   release/1.2.0
+   ```
+5. 「Create Branch」
+6. 自動で release/1.2.0 に切り替わる
+
+---
+
+## 2) リリース用の不要フォルダ削除（必要な場合）
+
+### ▼ 手動で削除するフォルダ一覧（例）
+- `/docs/dev-only`
+- `/local-config`
+- `/tmp`
+
+### ▼ SourceTree 操作
+1. 左パネルでフォルダを右クリック → **削除**
+2. 「ファイルステータス」で削除が表示される
+3. コミットメッセージ  
+   ```
+   chore(release): remove dev-only folders
+   ```
+4. Commit → Push
+
+---
+
+## 3) （任意）不要行削除パッチの適用
+
+特定行だけ削除したい場合は、事前に作成したパッチを適用する。
+
+### ▼ パッチ適用（CLI）
+```
+git apply 0001-remove-debug-lines.patch
+```
+
+### ▼ その後
+SourceTree の「ファイルステータス」に差分が出るので Commit → Push。
+
+---
+
+## 4) 動作確認（ステージング / QA）
+
+release ブランチをデプロイして動作確認を行う。
+
+---
+
+## 5) main へマージ（リリース確定）
+
+### ▼ SourceTree 操作
+1. 左パネルで **main** をダブルクリック（チェックアウト）
+2. 上部メニュー **Merge**
+3. マージ元に **release/1.2.0** を選択
+4. 「OK」  
+5. 問題なければ Commit → Push
+
+---
+
+## 6) タグ付け（リリースの公式記録）
+
+### ▼ SourceTree 操作
+1. main にいる状態で、上部メニュー **Tag**
+2. Tag name に以下を入力  
+   ```
+   v1.2.0
+   ```
+3. Message（任意）  
+   ```
+   Release 1.2.0
+   ```
+4. 「Create Tag」
+5. Push（タグにチェックを入れる）
+
+---
+
+## 7) develop へ反映（release の変更を戻す）
+
+release ブランチで削除したフォルダや修正を develop に戻す。
+
+### ▼ SourceTree 操作
+1. develop をチェックアウト
+2. 上部メニュー **Merge**
+3. マージ元に **main** を選択
+4. 「OK」  
+5. Commit → Push
+
+---
+
+## 8) release ブランチの削除（任意）
+
+GitHub または SourceTree で release ブランチを削除する。
+
+---
+
+# ✔ リリースの最終成果物
+
+- main にリリース内容が反映されている  
+- タグ `v1.2.0` が付いている  
+- develop にも反映済み  
+- 不要フォルダは release だけから除外されている  
+
+これでリリース完了。
+
+---
+
 ---
 
 ## 🔧 リリース前の準備
