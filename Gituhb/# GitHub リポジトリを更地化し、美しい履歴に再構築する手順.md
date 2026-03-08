@@ -152,3 +152,90 @@ release：必要に応じて作成
 - 過去の履歴は main-old に残るため安全  
 
 ---
+
+# GitHub ブランチ名変更手順（main → main-old、main-new → main）
+
+この手順では、GitHub 上でブランチ名を変更し、
+新しいきれいな履歴を持つ `main-new` を本番用の `main` として設定します。
+
+---
+
+## 1. ブランチ一覧を開く
+
+1. GitHub のリポジトリ画面を開く  
+2. 上部タブの **Code** をクリック  
+3. ファイル一覧の上にある **「2 branches」**（数字は環境により異なる）をクリック  
+4. ブランチ一覧が表示される
+
+---
+
+## 2. 旧 main を main-old にリネームする
+
+1. ブランチ一覧の中から **main** を探す  
+2. 右側にある **鉛筆アイコン（Rename）** をクリック  
+3. 新しい名前を入力  
+   ```
+   main-old
+   ```
+4. **Rename branch** を押す
+
+これで旧 main は `main-old` に変更されます。
+
+---
+
+## 3. 新しい main-new を main にリネームする
+
+1. 同じブランチ一覧で **main-new** を探す  
+2. 右側の **鉛筆アイコン（Rename）** をクリック  
+3. 新しい名前を入力  
+   ```
+   main
+   ```
+4. **Rename branch** を押す
+
+これで `main-new` が新しい `main` になります。
+
+---
+
+## 4. Default branch（デフォルトブランチ）を確認する
+
+1. GitHub 上部の **Settings** をクリック  
+2. 左メニューの **Branches** をクリック  
+3. Default branch が **main** になっていることを確認  
+   - もし main になっていなければ、  
+     **Change default branch** から main を選択して変更する
+
+---
+
+## 5. 新しい main にブランチ保護ルールを設定する（必要に応じて）
+
+1. Settings → Branches  
+2. Branch protection rules の **Add rule** をクリック  
+3. 以下の設定を推奨  
+   - Require a pull request before merging  
+   - Require status checks  
+   - Require linear history  
+   - Require signed commits（必要なら）
+
+---
+
+## 6. 完了後のブランチ構成
+
+```
+main-old   ← 旧履歴（バックアップ）
+main       ← 新しいきれいな履歴（本番用）
+develop    ← main から作り直す（必要に応じて）
+```
+
+---
+
+## 7. 注意点
+
+- リポジトリの設定（Secrets、Actions、Collaborators など）は消えません  
+- main に紐づいていた保護ルールは main-old に移動します  
+- 新しい main に対して保護ルールを付け直す必要があります  
+- Issue / PR はそのまま残ります（必要に応じて整理）
+
+---
+
+以上で、新しい main を本番用として安全に切り替えることができます。
