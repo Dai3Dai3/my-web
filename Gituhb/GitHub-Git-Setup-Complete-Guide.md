@@ -401,19 +401,24 @@ git push origin v1.2.0
 
 **やること**
 - GitHub → Issues で担当の Issue を確認
-- Issue の「Acceptance Criteria」（受入条件）を読んで理解
+- Issue の「Acceptance Criteria」（受入条件）を読んで理解→不要
 - 不明な点があればコメント欄で質問
 
 ### ステップ 2: ブランチ作成
 
 **GUI (SourceTree)**
-1. SourceTree を起動 → 該当リポジトリを開く
-2. 左パネルの "Branches" から develop を右クリック
-3. "Checkout Develop" をクリック
-4. "Fetch & Pull" をクリックして最新化
-5. "Branch" ボタン → "New Branch"
-6. Branch name: `feature/ISSUE-123-short-desc` を入力
-7. "Create Branch" → 自動で新ブランチに checkout
+- SourceTree を起動し、対象リポジトリを開く
+- 上部メニューの 「Fetch」 をクリックし、リモートの最新状態を取得
+- 左パネルの 「Remotes → origin → develop」 を右クリック
+- ※ローカルに develop がない場合はここに表示される
+- 「ブランチをチェックアウト」 または
+「新しいローカルブランチを作成」 をクリック
+- これでローカル develop が作成され、develop に切り替わる
+- 上部の 「Branch」 ボタン → 「New Branch」 をクリック
+- Branch name に以下の形式で入力
+    feature/ISSUE-123-short-desc
+- 「Create Branch」をクリック
+- 自動で新しい feature ブランチにチェックアウトされる
 
 **またはコマンド**
 ```bash
