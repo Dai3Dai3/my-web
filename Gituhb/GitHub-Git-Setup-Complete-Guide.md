@@ -1009,7 +1009,7 @@ git apply 0001-remove-debug-lines.patch
 これが最も安全で、再現性が高く、チーム全体で迷わない運用。
 
 ---
-テスト
+
 ---
 
 ## 2) CHANGELOG・EXCEL_CHANGELOG を更新
