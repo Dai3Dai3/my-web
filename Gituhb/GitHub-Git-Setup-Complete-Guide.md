@@ -482,7 +482,7 @@ git lfs unlock configs/excel/setting.xlsx
 
 **Push（SourceTree）**
 1. "Push" ボタン
-2. "Set upstream" にチェック
+2. "Set upstream" にチェック→不要
 3. "Push" をクリック → feature ブランチがリモートに作成される
 
 **PR 作成（GitHub Web）**
@@ -549,18 +549,6 @@ git push origin --delete feature/ISSUE-123-short-desc
 - 各ファイルの diff を確認
 - 必要に応じてコメント追加（右端の + をクリック）
 
-**4) Excel（バイナリ）変更の場合**
-- PR に CSV ファイル（`configs/csv/` 配下）があるか確認
-- CSV を GitHub 上で diff を見て確認
-- 必要なら .xlsx をダウンロードして Spreadsheet Compare で比較
-
-**5) ローカルで再現確認（必要な場合）**
-```bash
-git fetch origin pull/<PR_NUMBER>/head:<BRANCH_NAME>
-git checkout <BRANCH_NAME>
-# 動作確認、テスト実行など
-git checkout develop
-```
 
 **6) 承認またはコメント**
 - 問題なければ "Approve"（右上の Review button）
@@ -569,9 +557,418 @@ git checkout develop
 **7) マージ権限者がマージ**
 - Approve が必要数集まり CI が成功したら、マージ権限者がマージボタンをクリック
 
+
+こうすると、内側の ```sh が壊れずに全文を 1 つの md ブロックとして保持できます。
+
+---
+
+# ✅ **今度こそ、完全に「全文がひとつの .md コードブロック」に収まった正しい形式**
+
+以下は **フェンス 4 本（````）で囲んだ完全版**です。  
+これなら絶対に壊れません。
+
+---
+
+````md
+# 8. PR 作成とレビュー手順（レビュワー + 開発者）
+
+---
+
+## 🔍 レビューの流れ（レビュワー）
+
+### **1) PR をクリックして開く**
+- GitHub → Pull requests → 対象 PR を開く
+- PR 本文（概要・目的・変更内容）を確認する
+
+---
+
+### **2) CI（Jenkins）ステータスを確認**
+- PR 下部の **Checks** セクションを確認
+- Jenkins が **✓ success** になっているか確認
+- ❌ の場合はマージ不可  
+  → 作成者に修正依頼（コメント or Request changes）
+
+---
+
+### **3) コード diff を確認**
+- 上部タブ **「Files changed」** をクリック
+- 変更されたファイルの diff を確認
+
+#### ▼ コメントの付け方（詳細）
+1. コメントしたい行にカーソルを合わせる  
+2. 行番号の右側に **「＋」** が表示される  
+3. 「＋」をクリックするとコメント入力欄が開く  
+4. コメントを入力  
+5. 以下のいずれかを選択  
+   - **Add single comment**（単発コメント）  
+   - **Start a review**（複数コメントをまとめてレビュー）
+
+#### ▼ ファイル全体へのコメント
+- diff 上部の **「Add a general comment」** から追加可能
+
+---
+
+### **4) レビューの提出**
+右上の **「Review changes」** をクリックし、以下から選択：
+
+- **Approve**  
+  → 問題なし。マージ可能
+- **Comment**  
+  → コメントのみ。承認でも却下でもない
+- **Request changes**  
+  → 修正が必要。マージ不可（ブランチ保護ルールがある場合）
+
+---
+
+## 🛠 修正が必要な場合（開発者側の操作）
+
+レビュワーが **Request changes** またはコメントで修正を依頼した場合、  
+PR 作成者（開発者）は以下の手順で対応する。
+
+---
+
+### **① ローカルで feature ブランチをチェックアウト**
+```sh
+git checkout feature/ISSUE-123-short-desc
+```
+（SourceTree なら左パネルのブランチをダブルクリック）
+
+---
+
+### **② 指摘内容を修正**
+- コード修正  
+- コメント対応  
+- テスト修正  
+- Lint 修正など
+
+---
+
+### **③ 修正内容をコミット**
+```sh
+git add .
+git commit -m "fix: レビュー指摘対応"
+```
+
+---
+
+### **④ リモートへ push**
+```sh
+git push
+```
+
+push すると PR に自動で反映される。
+
+---
+
+### **⑤ CI（Jenkins）が再実行される**
+- 修正後のコードで Jenkins が自動再実行
+- success になるまで待つ
+- ❌ の場合は再度修正
+
+---
+
+### **⑥ レビュワーが再レビュー**
+- 修正内容を確認
+- 問題なければ **Approve**
+
+---
+
+## 🚀 7) マージ権限者がマージ
+
+### ▼ マージ条件
+- 必要な Approve が揃っている  
+- CI が success  
+- コンフリクトなし  
+
+### ▼ feature → develop の場合（推奨）
+**Squash and merge**  
+→ PR 全体を 1 コミットにまとめて develop に取り込む
+
+---
 ---
 
 ## 9. リリース手順（リリース担当向け）
+SourceTree を使ったリリース作業の手順です。  
+release ブランチの作成、CHANGELOG 更新、バージョン更新までを含みます。
+
+---
+
+## 🔧 リリース前の準備
+
+---
+
+## 1) Release ブランチ作成（SourceTree）
+
+### ① develop を最新化
+1. 左パネルの **Branches → develop** をダブルクリック（チェックアウト）
+2. 上部メニューの **Fetch** をクリック
+3. 上部メニューの **Pull** をクリック  
+   → 「origin / develop」を選択して最新化
+
+---
+
+### ② release ブランチを作成
+1. 上部メニューの **Branch** ボタンをクリック
+2. Branch name に以下を入力  
+   ```
+   release/1.2.0
+   ```
+3. 「Create Branch」をクリック  
+4. 自動で release/1.2.0 にチェックアウトされる
+
+---
+
+### ③ リモートへ push
+1. 上部メニューの **Push** をクリック
+2. 「release/1.2.0」にチェックを入れる
+3. 「Track remote branch（リモート追跡）」にチェック
+4. 「Push」をクリック
+
+
+
+# リリース時の不要フォルダ・不要行削除運用ガイド
+
+本ドキュメントでは、以下の要件を満たすための運用方法をまとめる。
+
+- develop には必要なフォルダがある  
+- しかし release ブランチには含めたくない  
+- さらに、特定のファイルの特定行だけ削除したい場合もある  
+- パッチ方式で効率化したい  
+
+---
+
+# 1. 基本方針
+
+最も安全で現実的な方法は以下の 2 つ：
+
+## ✔ 方法 A：release ブランチ作成後に不要フォルダを削除する  
+（SourceTree で右クリック → 削除 → コミット）
+
+## ✔ 方法 B：不要フォルダ削除や特定行削除を「パッチ化」して自動適用する  
+（毎回同じ削除を自動化できる）
+
+どちらも develop には影響せず、release ブランチだけに反映される。
+
+---
+
+# 2. 方法 A：release ブランチ作成後に削除するフォルダ一覧（固定化）
+
+release ブランチを作成したら、以下のフォルダを削除する：
+
+- `/docs/dev-only`
+- `/local-config`
+- `/tmp`
+
+## ▼ SourceTree 操作
+1. release ブランチにチェックアウト  
+2. 左パネルでフォルダを右クリック  
+3. 「削除」を選択  
+4. 「ファイルステータス」で削除が表示される  
+5. コミットメッセージ例：  
+   ```
+   chore(release): remove dev-only folders
+   ```
+6. Commit → Push
+
+---
+
+# 3. 方法 B：パッチ方式で自動化する
+
+## ▼ 1. 一度だけ「削除コミット」を作る
+release ブランチで不要フォルダを削除し、コミットする。
+
+例：
+```
+chore(release): remove dev-only folders
+```
+
+## ▼ 2. そのコミットをパッチ化する
+```
+git format-patch -1 <コミットID>
+```
+
+これで以下のようなパッチファイルが生成される：
+
+```
+0001-remove-dev-folders.patch
+```
+
+## ▼ 3. 次回以降の release 作成時にパッチを適用
+release ブランチを作成したら、以下を実行：
+
+```
+git apply 0001-remove-dev-folders.patch
+```
+
+これで毎回同じフォルダが自動で削除される。
+
+---
+
+# 4. 特定行だけ削除するパッチも可能
+
+Git パッチは「行単位の差分」を記録するため、以下のような細かい変更も可能：
+
+- 1 行だけ削除  
+- 1 行だけ追加  
+- 1 文字だけ変更  
+- 特定のシンボル（例：`DEBUG_MODE = true`）を変更  
+- 特定の if 文だけ削除  
+- 特定の import だけ削除  
+- コメント行だけ削除  
+- 複数ファイルにまたがる複雑な変更  
+
+すべてパッチで実現できる。
+
+---
+
+# 5. 特定行削除パッチの例
+
+例：`src/config.js` の 3 行だけ削除したい場合。
+
+```
+diff --git a/src/config.js b/src/config.js
+--- a/src/config.js
++++ b/src/config.js
+@@ -10,7 +10,3 @@
+   enableFeatureX: true,
+ }
+
+-// ↓ この3行だけ削除したい
+-console.log("debug mode");
+-debugger;
+```
+
+このパッチを apply すると、該当行だけが削除される。
+
+---
+
+# 6. 特定行削除パッチの作り方
+
+## ▼ 1. release ブランチで行を削除してコミット
+例：
+```
+chore(release): remove debug lines
+```
+
+## ▼ 2. パッチ化
+```
+git format-patch -1 <コミットID>
+```
+
+生成例：
+```
+0001-remove-debug-lines.patch
+```
+
+## ▼ 3. 次回以降の release 作成時に適用
+```
+git apply 0001-remove-debug-lines.patch
+```
+
+---
+
+# 7. まとめ
+
+| 要件 | 最適な方法 |
+|------|-------------|
+| develop には必要、release には不要なフォルダ | release ブランチで削除（手動 or パッチ） |
+| 特定行だけ削除したい | パッチ方式 |
+| 毎回同じ削除を自動化したい | パッチ方式 |
+| チーム全体で安全に運用したい | 削除フォルダ一覧を手順書に固定化 |
+
+---
+
+# 8. 推奨運用（Daisuke さんの環境向け）
+
+1. release ブランチ作成  
+2. パッチ適用（不要フォルダ削除 + 不要行削除）  
+3. CHANGELOG 更新  
+4. バージョン更新  
+5. コミット & Push  
+
+これが最も安全で、再現性が高く、チーム全体で迷わない運用。
+
+---
+
+
+
+---
+
+## 2) CHANGELOG・EXCEL_CHANGELOG を更新
+
+---
+
+### ① CHANGELOG.md を編集
+1. SourceTree 左パネルのファイル一覧から **CHANGELOG.md** をダブルクリック
+2. エディタで以下のように追記  
+   ```
+   ## [1.2.0] - 2026-03-02
+   ### Added
+   - User login feature (Closes #123)
+   - Password reset flow
+
+   ### Fixed
+   - Timeout issue on API endpoint
+   ```
+
+---
+
+### ② EXCEL_CHANGELOG.csv を編集
+1. SourceTree 左パネルから **configs/EXCEL_CHANGELOG.csv** をダブルクリック
+2. Excel またはエディタで変更内容を追記
+
+---
+
+### ③ 変更をコミット
+1. SourceTree の「ファイルステータス」画面で  
+   - CHANGELOG.md  
+   - EXCEL_CHANGELOG.csv  
+   - package.json（後述）  
+   をステージング
+2. コミットメッセージを入力  
+   ```
+   chore(release): prepare 1.2.0
+   ```
+3. 「Commit」をクリック
+
+---
+
+## 3) バージョン番号を package.json 等に反映
+
+---
+
+### ① package.json を編集
+1. SourceTree 左パネルから **package.json** をダブルクリック
+2. version を `1.2.0` に更新  
+   例：  
+   ```
+   "version": "1.2.0"
+   ```
+
+---
+
+### ② コミット & push
+1. 「ファイルステータス」で package.json をステージング
+2. コミットメッセージ  
+   ```
+   chore(release): bump version to 1.2.0
+   ```
+3. 「Commit」→「Push」
+
+---
+
+## ✔ これで release ブランチの準備完了
+- release/1.2.0 が GitHub に作成される  
+- CHANGELOG / EXCEL_CHANGELOG / version が反映済み  
+- この後は QA / ステージング環境での確認へ進む
+
+---
+
+
+
+
+
+
 
 ### リリース前の準備
 
